@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_search"
+        android:title="이미지 검색"
+        android:icon="@drawable/ic_search"/>
+    <item android:id="@+id/menu_storage"
+        android:title="내 보관함"
+        android:icon="@drawable/ic_storage_box"/>
+</menu>

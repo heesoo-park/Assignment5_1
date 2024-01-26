@@ -6,17 +6,22 @@ import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.example.searchcollectapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), SendFavoriteInfo {
+class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
+    private val viewModel: MainViewModel by viewModels()
 
     private var items: ArrayList<Document> = arrayListOf()
     private var favoriteItems: ArrayList<Document> = arrayListOf()
@@ -38,12 +43,28 @@ class MainActivity : AppCompatActivity(), SendFavoriteInfo {
             Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
         }
 
-        binding.btnMainSearchImage.setOnClickListener {
-            setFragment(SearchFragment.newInstance(items, favoriteItems))
-        }
+        val adapter = ViewPagerAdapter(this@MainActivity)
+        binding.viewPagerMain.adapter = adapter
 
-        binding.btnMainStorageBox.setOnClickListener {
-            setFragment(StorageFragment.newInstance(favoriteItems))
+        binding.viewPagerMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                binding.bottomNavigationViewMain.menu.getItem(position).isChecked = true
+            }
+        })
+
+        binding.bottomNavigationViewMain.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.menu_search -> {
+                    binding.viewPagerMain.currentItem = 0
+                    return@setOnItemSelectedListener true
+                }
+                R.id.menu_storage -> {
+                    binding.viewPagerMain.currentItem = 1
+                    return@setOnItemSelectedListener true
+                }
+                else -> return@setOnItemSelectedListener false
+            }
         }
     }
 
@@ -55,7 +76,7 @@ class MainActivity : AppCompatActivity(), SendFavoriteInfo {
         }
         items.sortByDescending { it.dateTime }
 
-        setFragment(SearchFragment.newInstance(items, favoriteItems))
+        viewModel.registerSearchResult(items)
     }
 
     private fun setUpSearchParameter(word: String): HashMap<String, String> {
@@ -67,23 +88,14 @@ class MainActivity : AppCompatActivity(), SendFavoriteInfo {
         )
     }
 
-
-    private fun setFragment(fragment: Fragment) {
-        supportFragmentManager.commit {
-            replace(R.id.frame_layout_main, fragment)
-            setReorderingAllowed(true)
-            addToBackStack("")
-        }
-    }
-
-    override fun sendDocument(document: Document) {
-        if (favoriteItems.find { it == document } != null) {
-            favoriteItems.removeIf { it == document }
-        } else {
-            favoriteItems.add(document)
-        }
-        favoriteItems.sortByDescending { it.dateTime }
-    }
+//    override fun sendDocument(document: Document) {
+//        if (favoriteItems.find { it == document } != null) {
+//            favoriteItems.removeIf { it == document }
+//        } else {
+//            favoriteItems.add(document)
+//        }
+//        favoriteItems.sortByDescending { it.dateTime }
+//    }
 
     override fun onBackPressed() {
         if (supportFragmentManager.fragments[0] is SearchFragment) {
