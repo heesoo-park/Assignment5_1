@@ -3,8 +3,6 @@ package com.example.searchcollectapp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 
 class MainViewModel: ViewModel() {
 
@@ -14,23 +12,36 @@ class MainViewModel: ViewModel() {
     private val _favoriteResult: MutableLiveData<FavoriteResultUiState> = MutableLiveData(FavoriteResultUiState.init())
     val favoriteResult: LiveData<FavoriteResultUiState> get() = _favoriteResult
 
-    fun registerSearchResult(results: ArrayList<Document>) {
+    fun changeMarker(selectedResult: Document) {
+        if (searchUiState.value?.searchResult?.find { it == selectedResult } != null) {
+            _searchUiState.value = searchUiState.value?.copy(
+                searchResult = searchUiState.value?.searchResult.orEmpty().toMutableList().apply {
+                    set(indexOf(find { it == selectedResult }), selectedResult.copy(
+                        isLiked = !selectedResult.isLiked
+                    ))
+                }
+            )
+        }
+    }
+
+    fun registerSearchResult(results: List<Document>) {
         _searchUiState.value = SearchResultUiState(results)
     }
 
     fun registerFavoriteResult(selectedResult: Document) {
-        _favoriteResult.value = if (favoriteResult.value?.favoriteResult?.find { it == selectedResult } != null) {
-            favoriteResult.value?.copy(
-                favoriteResult = favoriteResult.value?.favoriteResult.orEmpty().toMutableList().apply {
-                    add(selectedResult)
-                    sortBy { it.dateTime }
-                })
+        if (favoriteResult.value?.favoriteResult?.find { it == selectedResult } != null) {
+            _favoriteResult.value = FavoriteResultUiState(favoriteResult.value?.favoriteResult.orEmpty().toMutableList().apply {
+                removeIf { it == selectedResult }
+            })
         } else {
-            favoriteResult.value?.copy(
+            _favoriteResult.value = favoriteResult.value?.copy(
                 favoriteResult = favoriteResult.value?.favoriteResult.orEmpty().toMutableList().apply {
-                    removeIf { it == selectedResult }
-                    sortBy { it.dateTime }
-                })
+                    add(selectedResult.copy(
+                        isLiked = !selectedResult.isLiked
+                    ))
+                    sortByDescending { it.dateTime }
+                }
+            )
         }
     }
 }

@@ -3,9 +3,15 @@ package com.example.searchcollectapp
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
-import java.time.LocalDateTime
 
-data class SearchResponse(
+data class ImageSearchResponse(
+    @SerializedName("documents")
+    val documents: MutableList<Document>?,
+    @SerializedName("meta")
+    val metaData: MetaData?
+)
+
+data class VideoSearchResponse(
     @SerializedName("documents")
     val documents: MutableList<Document>?,
     @SerializedName("meta")
@@ -39,4 +45,5 @@ data class Document(
     val thumbnailUrl: String,
     @SerializedName("width")
     val width: Int,
+    var isLiked: Boolean = false
 ): Parcelable

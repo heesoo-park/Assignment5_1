@@ -19,4 +19,8 @@ class ViewPagerAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter
             else -> storageFragment
         }
     }
+
+    fun getLastWord(): String {
+        return searchFragment.sendLastWord()
+    }
 }

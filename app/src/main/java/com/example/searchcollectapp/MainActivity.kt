@@ -1,19 +1,13 @@
 package com.example.searchcollectapp
 
-import android.content.Context
+import android.app.ProgressDialog.show
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import androidx.lifecycle.lifecycleScope
+import androidx.activity.OnBackPressedCallback
 import androidx.viewpager2.widget.ViewPager2
 import com.example.searchcollectapp.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,29 +15,29 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val viewModel: MainViewModel by viewModels()
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (binding.viewPagerMain.currentItem == 0) {
+                val pref = getSharedPreferences("pref", MODE_PRIVATE)
+                val edit = pref.edit()
+                edit.putString("searchWord", adapter.getLastWord())
+                edit.apply()
+                finish()
+            } else {
+                binding.viewPagerMain.currentItem = 0
+                binding.bottomNavigationViewMain.menu.getItem(0).isChecked = true
+            }
+        }
+    }
 
-    private var items: ArrayList<Document> = arrayListOf()
-    private var favoriteItems: ArrayList<Document> = arrayListOf()
+    private val adapter = ViewPagerAdapter(this@MainActivity)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val pref = getSharedPreferences("pref",0)
-        binding.etMainSearch.setText(pref.getString("searchWord",""))
+        this.onBackPressedDispatcher.addCallback(this, callback)
 
-        binding.btnMainSearch.setOnClickListener {
-            communicationNetwork(setUpSearchParameter(binding.etMainSearch.text.toString()))
-
-            binding.etMainSearch.clearFocus()
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(window.decorView.applicationWindowToken, 0)
-            Toast.makeText(this, "click", Toast.LENGTH_SHORT).show()
-        }
-
-        val adapter = ViewPagerAdapter(this@MainActivity)
         binding.viewPagerMain.adapter = adapter
 
         binding.viewPagerMain.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -66,46 +60,5 @@ class MainActivity : AppCompatActivity() {
                 else -> return@setOnItemSelectedListener false
             }
         }
-    }
-
-    private fun communicationNetwork(param: HashMap<String, String>) = lifecycleScope.launch {
-        val responseData = NetworkClient.searchNetwork.searchImage(param)
-        items.clear()
-        responseData.documents?.forEach {
-            items.add(it)
-        }
-        items.sortByDescending { it.dateTime }
-
-        viewModel.registerSearchResult(items)
-    }
-
-    private fun setUpSearchParameter(word: String): HashMap<String, String> {
-        return hashMapOf(
-            "query" to word,
-            "sort" to "accuracy",
-            "page" to "1",
-            "size" to "80"
-        )
-    }
-
-//    override fun sendDocument(document: Document) {
-//        if (favoriteItems.find { it == document } != null) {
-//            favoriteItems.removeIf { it == document }
-//        } else {
-//            favoriteItems.add(document)
-//        }
-//        favoriteItems.sortByDescending { it.dateTime }
-//    }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.fragments[0] is SearchFragment) {
-            val pref = getSharedPreferences("pref", MODE_PRIVATE)
-            val edit = pref.edit()
-            edit.putString("searchWord", binding.etMainSearch.text.toString())
-            edit.apply()
-            finish()
-        }
-
-        super.onBackPressed()
     }
 }

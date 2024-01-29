@@ -4,6 +4,9 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.searchcollectapp.databinding.SearchResultItemBinding
@@ -11,11 +14,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class StorageAdapter(private val context: Context, private val favoriteItems: MutableList<Document>) :
-    RecyclerView.Adapter<StorageAdapter.StorageViewHolder>() {
+class StorageAdapter(private val context: Context) :
+    ListAdapter<Document, StorageAdapter.StorageViewHolder>(ListComparator()){
 
     interface StorageThumbnailClickListener {
-        fun onClick(position: Int)
+        fun onClick(selectedDocument: Document)
     }
 
     var storageThumbnailClickListener: StorageThumbnailClickListener? = null
@@ -25,9 +28,20 @@ class StorageAdapter(private val context: Context, private val favoriteItems: Mu
 
     inner class StorageViewHolder(private val binding: SearchResultItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val thumbnail = binding.ivSearchResultThumbnail
-        val site = binding.tvSearchResultSite
-        val datetime = binding.tvSearchResultDatetime
+
+        fun bind(document: Document) {
+            binding.apply {
+                Glide.with(context)
+                    .load(document.thumbnailUrl)
+                    .into(ivSearchResultThumbnail)
+                tvSearchResultSite.text = document.displaySiteName
+                tvSearchResultDatetime.text =
+                    outputFormat.format(inputFormat.parse(document.dateTime) as Date)
+                ivSearchResultThumbnail.setOnClickListener {
+                    storageThumbnailClickListener?.onClick(document)
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StorageViewHolder {
@@ -41,19 +55,24 @@ class StorageAdapter(private val context: Context, private val favoriteItems: Mu
     }
 
     override fun getItemCount(): Int {
-        return favoriteItems.size
+        return currentList.size
     }
 
     override fun onBindViewHolder(holder: StorageViewHolder, position: Int) {
-        holder.thumbnail.setOnClickListener {
-            storageThumbnailClickListener?.onClick(position)
+        holder.bind(currentList[position])
+    }
+
+    class ListComparator : DiffUtil.ItemCallback<Document>() {
+        override fun areItemsTheSame(oldItem: Document, newItem: Document): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
         }
 
-        Glide.with(context)
-            .load(favoriteItems[position].thumbnailUrl)
-            .into(holder.thumbnail)
-        holder.site.text = favoriteItems[position].displaySiteName
-        holder.datetime.text =
-            outputFormat.format(inputFormat.parse(favoriteItems[position].dateTime) as Date)
+        override fun areContentsTheSame(oldItem: Document, newItem: Document): Boolean {
+            return oldItem.thumbnailUrl == newItem.thumbnailUrl
+        }
+    }
+
+    fun removeItem(newList: List<Document>) {
+        submitList(newList)
     }
 }

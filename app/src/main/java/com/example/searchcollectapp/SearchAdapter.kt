@@ -4,7 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.searchcollectapp.databinding.SearchResultItemBinding
@@ -12,11 +15,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SearchAdapter(private val context: Context, private val results: MutableList<Document>, private val favoriteItems: MutableList<Document>) :
-    RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
+class SearchAdapter(private val context: Context) :
+    ListAdapter<Document, SearchAdapter.SearchViewHolder>(ListComparator()) {
 
     interface SearchThumbnailClickListener {
-        fun onClick(view: View, position: Int)
+        fun onClick(selectedDocument: Document)
     }
 
     var searchThumbnailClickListener: SearchThumbnailClickListener? = null
@@ -26,10 +29,21 @@ class SearchAdapter(private val context: Context, private val results: MutableLi
 
     inner class SearchViewHolder(private val binding: SearchResultItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val thumbnail = binding.ivSearchResultThumbnail
-        val site = binding.tvSearchResultSite
-        val datetime = binding.tvSearchResultDatetime
-        val favorite = binding.ivSearchResultFavorite
+
+        fun bind(document: Document) {
+            binding.apply {
+                Glide.with(context)
+                    .load(document.thumbnailUrl)
+                    .into(ivSearchResultThumbnail)
+                tvSearchResultSite.text = document.displaySiteName
+                tvSearchResultDatetime.text =
+                    outputFormat.format(inputFormat.parse(document.dateTime) as Date)
+                ivSearchResultFavorite.isVisible = document.isLiked
+                ivSearchResultThumbnail.setOnClickListener {
+                    searchThumbnailClickListener?.onClick(document)
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
@@ -43,20 +57,20 @@ class SearchAdapter(private val context: Context, private val results: MutableLi
     }
 
     override fun getItemCount(): Int {
-        return results.size
+        return currentList.size
     }
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-        holder.thumbnail.setOnClickListener {
-            searchThumbnailClickListener?.onClick(holder.favorite, position)
+        holder.bind(currentList[position])
+    }
+
+    class ListComparator : DiffUtil.ItemCallback<Document>() {
+        override fun areItemsTheSame(oldItem: Document, newItem: Document): Boolean {
+            return oldItem == newItem
         }
 
-        Glide.with(context)
-            .load(results[position].thumbnailUrl)
-            .into(holder.thumbnail)
-        holder.site.text = results[position].displaySiteName
-        holder.datetime.text =
-            outputFormat.format(inputFormat.parse(results[position].dateTime) as Date)
-        holder.favorite.isVisible = (favoriteItems.find { it == results[position] } != null)
+        override fun areContentsTheSame(oldItem: Document, newItem: Document): Boolean {
+            return oldItem.thumbnailUrl == newItem.thumbnailUrl
+        }
     }
 }

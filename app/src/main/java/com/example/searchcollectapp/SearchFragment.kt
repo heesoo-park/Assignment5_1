@@ -1,16 +1,15 @@
 package com.example.searchcollectapp
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.searchcollectapp.databinding.FragmentSearchBinding
 import kotlinx.coroutines.launch
@@ -22,25 +21,8 @@ class SearchFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
-    private var result: ArrayList<Document> = arrayListOf()
-    private var favoriteItems: ArrayList<Document> = arrayListOf()
-
     private val adapter by lazy {
-        SearchAdapter(
-            requireContext(),
-            viewModel.searchUiState.value?.searchResult.orEmpty().toMutableList(),
-            viewModel.favoriteResult.value?.favoriteResult.orEmpty().toMutableList()
-        )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            result =
-                it.getParcelableArrayList("result", Document::class.java) as ArrayList<Document>
-            favoriteItems =
-                it.getParcelableArrayList("favorite", Document::class.java) as ArrayList<Document>
-        }
+        SearchAdapter(requireContext())
     }
 
     override fun onCreateView(
@@ -56,24 +38,26 @@ class SearchFragment : Fragment() {
 
         initViewModel()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                launch {
-                    viewModel.searchUiState.observe(viewLifecycleOwner) {
-                        adapter.notifyDataSetChanged()
-                    }
-                }
-            }
+        val pref = requireContext().getSharedPreferences("pref", 0)
+        binding.etSearch.setText(pref.getString("searchWord", ""))
+
+        binding.btnSearch.setOnClickListener {
+            communicationNetwork(setUpSearchParameter(binding.etSearch.text.toString()))
+
+            binding.etSearch.clearFocus()
+            val inputMethodManager =
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            inputMethodManager.hideSoftInputFromWindow(
+                requireActivity().window.decorView.applicationWindowToken,
+                0
+            )
+            Toast.makeText(requireActivity(), "click", Toast.LENGTH_SHORT).show()
         }
 
         adapter.searchThumbnailClickListener = object : SearchAdapter.SearchThumbnailClickListener {
-            override fun onClick(view: View, position: Int) {
-                viewModel.registerFavoriteResult(
-                    viewModel.searchUiState.value?.searchResult?.get(
-                        position
-                    ) ?: Document("", "", "", "", 0, "", "", 0)
-                )
-                view.isVisible = !view.isVisible
+            override fun onClick(selectedDocument: Document) {
+                viewModel.changeMarker(selectedDocument)
+                viewModel.registerFavoriteResult(selectedDocument)
             }
         }
 
@@ -83,12 +67,30 @@ class SearchFragment : Fragment() {
 
     private fun initViewModel() = with(viewModel) {
         searchUiState.observe(viewLifecycleOwner) {
-            adapter.notifyDataSetChanged()
+            adapter.submitList(it.searchResult.toMutableList())
         }
+    }
+
+    private fun communicationNetwork(param: HashMap<String, String>) = lifecycleScope.launch {
+        val responseData = NetworkClient.searchNetwork.searchImage(param)
+        viewModel.registerSearchResult(responseData.documents.orEmpty().toList().sortedByDescending { it.dateTime })
+    }
+
+    private fun setUpSearchParameter(word: String): HashMap<String, String> {
+        return hashMapOf(
+            "query" to word,
+            "sort" to "accuracy",
+            "page" to "1",
+            "size" to "80"
+        )
     }
 
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    fun sendLastWord(): String {
+        return binding.etSearch.text.toString()
     }
 }
