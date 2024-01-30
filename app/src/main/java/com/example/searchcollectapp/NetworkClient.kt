@@ -7,8 +7,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object NetworkClient {
+    // 다음 검색 API의 베이스 URL
     private const val BASE_URL = "https://dapi.kakao.com/"
 
+    // 통신 과정을 로그에서 보기 위해 세팅하는 함수
     private fun createOkHttpClient(): OkHttpClient {
         val interceptor = HttpLoggingInterceptor()
 
@@ -26,11 +28,13 @@ object NetworkClient {
             .build()
     }
 
+    // Retrofit 객체를 Builder를 통해 생성
     private val searchRetrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(createOkHttpClient())
         .build()
 
+    // Retrofit 객체의 create를 통해 NetworkInterface 객체를 생성
     val searchNetwork: NetworkInterface = searchRetrofit.create(NetworkInterface::class.java)
 }

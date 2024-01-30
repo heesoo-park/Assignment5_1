@@ -1,4 +1,4 @@
-package com.example.searchcollectapp
+package com.example.searchcollectapp.storage
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,16 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.databinding.FragmentStorageBinding
+import com.example.searchcollectapp.main.MainViewModel
 
 class StorageFragment : Fragment() {
 
+    // 뷰 바인딩 초기화
     private var _binding: FragmentStorageBinding? = null
     private val binding get() = _binding!!
 
+    // 공유 뷰모델 선언
     private val viewModel: MainViewModel by activityViewModels()
 
-    val adapter: StorageAdapter by lazy {
+    // 어댑터 지연 초기화
+    private val storageAdapter: StorageAdapter by lazy {
         StorageAdapter(requireContext())
     }
 
@@ -31,22 +36,29 @@ class StorageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView()
         initViewModel()
+    }
 
-        adapter.storageThumbnailClickListener = object : StorageAdapter.StorageThumbnailClickListener {
-            override fun onClick(selectedDocument: Document) {
-                viewModel.changeMarker(selectedDocument)
-                viewModel.registerFavoriteResult(selectedDocument)
+    // 뷰 초기화하는 함수
+    private fun initView() {
+        // 리사이클러뷰 아이템 클릭 이벤트
+        storageAdapter.storageThumbnailClickListener = object :
+            StorageAdapter.StorageThumbnailClickListener {
+            override fun onClick(selectedImageDocument: Document) {
+                viewModel.controlMarker(selectedImageDocument)
+                viewModel.manageSelectedDocument(selectedImageDocument)
             }
         }
 
-        binding.rvStorageList.adapter = adapter
+        binding.rvStorageList.adapter = storageAdapter
         binding.rvStorageList.layoutManager = GridLayoutManager(requireContext(), 2)
     }
 
+    // 뷰모델 초기화하는 함수
     private fun initViewModel() = with(viewModel) {
-        favoriteResult.observe(viewLifecycleOwner) { uiState ->
-            adapter.removeItem(uiState.favoriteResult.toList())
+        storageUiState.observe(viewLifecycleOwner) { uiState ->
+            storageAdapter.submitList(uiState.selectedResult.toList())
         }
     }
 

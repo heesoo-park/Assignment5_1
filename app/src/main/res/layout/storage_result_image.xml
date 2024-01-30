@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="10dp"
+    android:paddingTop="10dp">
+
+    <ImageView
+        android:id="@+id/iv_storage_result_image_thumbnail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_storage_result_category_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[Image]"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/iv_storage_result_image_thumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/iv_storage_result_image_thumbnail" />
+
+    <TextView
+        android:id="@+id/tv_storage_result_image_site"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_storage_result_category_image"
+        app:layout_constraintEnd_toEndOf="@+id/iv_storage_result_image_thumbnail"
+        app:layout_constraintStart_toEndOf="@+id/tv_storage_result_category_image"
+        app:layout_constraintTop_toTopOf="@+id/tv_storage_result_category_image"
+        tools:text="Daum카페" />
+
+    <TextView
+        android:id="@+id/tv_storage_result_image_datetime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_storage_result_image_site"
+        tools:text="2024-01-21 22:50:57" />
+</androidx.constraintlayout.widget.ConstraintLayout>
