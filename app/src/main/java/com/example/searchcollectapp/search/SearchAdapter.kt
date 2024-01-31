@@ -119,7 +119,13 @@ class SearchAdapter(private val context: Context) :
 
     class ListComparator : DiffUtil.ItemCallback<Document>() {
         override fun areItemsTheSame(oldItem: Document, newItem: Document): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return if (oldItem is Document.ImageDocument && newItem is Document.ImageDocument) {
+                oldItem.thumbnailUrl == newItem.thumbnailUrl
+            } else if (oldItem is Document.VideoDocument && newItem is Document.VideoDocument) {
+                oldItem.url == newItem.url
+            } else {
+                false
+            }
         }
 
         override fun areContentsTheSame(oldItem: Document, newItem: Document): Boolean {

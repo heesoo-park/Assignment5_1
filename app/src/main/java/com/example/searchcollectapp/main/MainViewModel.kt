@@ -238,18 +238,20 @@ class MainViewModel(
     }
 
     // 필터타입에 맞춰서 서버로부터 데이터 통신하는 함수
-    fun communicationNetwork(word: String, page: Int, type: Int) = viewModelScope.launch {
+    private fun communicationNetwork(word: String, page: Int) = viewModelScope.launch {
         val param = setUpSearchParameter(word, page.toString())
         val response = arrayListOf<Document>()
 
-        when (type) {
+        when (type.value) {
             0 -> response.addAll(
                 NetworkClient.searchNetwork.searchImage(param).imageDocuments.orEmpty() +
                         NetworkClient.searchNetwork.searchVideo(param).videoDocuments.orEmpty()
             )
+
             1 -> response.addAll(
                 NetworkClient.searchNetwork.searchImage(param).imageDocuments.orEmpty()
             )
+
             2 -> response.addAll(
                 NetworkClient.searchNetwork.searchVideo(param).videoDocuments.orEmpty()
             )
@@ -277,12 +279,12 @@ class MainViewModel(
 
         page = 1
         updateLastWord(word)
-        type.value?.let { communicationNetwork(word, page++, it) }
+        communicationNetwork(word, page++)
     }
 
     // 스크롤을 최하단으로 내렸을 시 실행하는 함수
     fun processScrollSearch() {
-        type.value?.let { communicationNetwork(lastWord.value.toString(), page++, it) }
+        communicationNetwork(lastWord.value.toString(), page++)
     }
 
     // 필터 타입을 정하는 함수
@@ -291,10 +293,10 @@ class MainViewModel(
     }
 
     // 필터 타입 값이 변했을 때 호출되는 함수
-    fun filter(word: String, type: Int) {
+    fun filter(word: String) {
         if (word == "" || searchUiState.value?.searchResult.isNullOrEmpty()) return
 
         page = 1
-        communicationNetwork(lastWord.value.toString(), page++, type)
+        communicationNetwork(lastWord.value.toString(), page++)
     }
 }

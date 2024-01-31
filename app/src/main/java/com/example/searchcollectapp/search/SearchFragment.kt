@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.R
 import com.example.searchcollectapp.databinding.FragmentSearchBinding
@@ -107,6 +108,7 @@ class SearchFragment : Fragment() {
 
         rvSearchList.adapter = searchAdapter
         rvSearchList.layoutManager = GridLayoutManager(requireContext(), 2)
+        rvSearchList.itemAnimator = null
 
         // 리사이클러뷰 스크롤에 따라 나타나고 사라지는 플로팅 액션 버튼 처리
         rvSearchList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -157,7 +159,7 @@ class SearchFragment : Fragment() {
             binding.etSearch.setText(it)
         }
         type.observe(viewLifecycleOwner) {
-            viewModel.filter(binding.etSearch.text.toString(), it)
+            viewModel.filter(binding.etSearch.text.toString())
         }
     }
 

@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.databinding.FragmentStorageBinding
 import com.example.searchcollectapp.main.MainViewModel
@@ -45,7 +46,7 @@ class StorageFragment : Fragment() {
     }
 
     // 뷰 초기화하는 함수
-    private fun initView() {
+    private fun initView() = with(binding) {
         // 리사이클러뷰 아이템 클릭 이벤트
         storageAdapter.storageThumbnailClickListener = object :
             StorageAdapter.StorageThumbnailClickListener {
@@ -71,8 +72,11 @@ class StorageFragment : Fragment() {
             }
         }
 
-        binding.rvStorageList.adapter = storageAdapter
-        binding.rvStorageList.layoutManager = GridLayoutManager(requireContext(), 2)
+        rvStorageList.adapter = storageAdapter
+        rvStorageList.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
+            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        }
+        rvStorageList.itemAnimator = null
     }
 
     // 뷰모델 초기화하는 함수
