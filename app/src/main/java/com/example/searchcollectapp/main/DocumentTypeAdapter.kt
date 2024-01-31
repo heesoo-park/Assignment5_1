@@ -1,6 +1,7 @@
 package com.example.searchcollectapp.main
 
 import com.example.searchcollectapp.Document
+import com.example.searchcollectapp.UseConstant.MEMBER_NAME
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -15,7 +16,7 @@ class DocumentTypeAdapter : JsonDeserializer<Document> {
     ): Document {
         val jsonObject = json.asJsonObject
         // ImageDocument에만 있는 image_url 유무를 기준으로 삼음
-        return if (jsonObject.has("image_url")) {
+        return if (jsonObject.has(MEMBER_NAME)) {
             context.deserialize(json, Document.ImageDocument::class.java)
         } else {
             context.deserialize(json, Document.VideoDocument::class.java)

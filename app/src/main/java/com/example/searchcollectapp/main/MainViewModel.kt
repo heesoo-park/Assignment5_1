@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.NetworkClient
+import com.example.searchcollectapp.UseConstant.KEY_SEARCH_WORD
+import com.example.searchcollectapp.UseConstant.KEY_SELECT_DATASET
 import com.example.searchcollectapp.storage.StorageResultUiState
 import com.example.searchcollectapp.search.SearchResultUiState
 import com.google.gson.GsonBuilder
@@ -17,6 +19,8 @@ class MainViewModel(
     private val prefSharedPreferences: SharedPreferences,
     private val favoriteSharedPreferences: SharedPreferences
 ) : ViewModel() {
+
+    private var page = 0
 
     // 검색 결과 페이지에 나오는 데이터를 저장하는 라이브 데이터
     private val _searchUiState: MutableLiveData<SearchResultUiState> = MutableLiveData(
@@ -35,7 +39,7 @@ class MainViewModel(
     val lastWord: LiveData<String> = _lastWord
 
     // 마지막 검색어를 업데이트하는 함수
-    fun updateLastWord(word: String) {
+    private fun updateLastWord(word: String) {
         _lastWord.value = word
     }
 
@@ -190,25 +194,26 @@ class MainViewModel(
     }
 
     // JSON 데이터를 List타입으로 변환시켜 내 보관함 페이지에 보여질 데이터를 저장하는 라이브 데이터에 저장하는 함수
-    fun restoreFavoriteData(results: String) {
-        val gsonBuilder = GsonBuilder()
-        gsonBuilder.registerTypeAdapter(Document::class.java, DocumentTypeAdapter())
-        _storageUiState.value = StorageResultUiState(
-            gsonBuilder.create().fromJson(results, object : TypeToken<List<Document>>() {}.type)
-        )
+    fun restoreFavoriteData(results: List<Document>) {
+        _storageUiState.value = StorageResultUiState(results)
     }
 
     // sharedPreferences에 저장된 마지막 검색어를 불러오는 함수
     fun loadWordSharedPreferences() {
-        updateLastWord(prefSharedPreferences.getString("searchWord", "") ?: "")
+        updateLastWord(prefSharedPreferences.getString(KEY_SEARCH_WORD, "") ?: "")
     }
 
     // sharedPreferences에 저장된 내 보관함 데이터들을 불러오는 함수
     fun loadDataSharedPreferences() {
         val favoriteData =
-            favoriteSharedPreferences.getString("favorite_data", "")
+            favoriteSharedPreferences.getString(KEY_SELECT_DATASET, "")
 
-        if (favoriteData != null) restoreFavoriteData(favoriteData)
+        if (favoriteData != "") {
+            val gsonBuilder = GsonBuilder()
+            gsonBuilder.registerTypeAdapter(Document::class.java, DocumentTypeAdapter())
+
+            restoreFavoriteData(gsonBuilder.create().fromJson(favoriteData, object : TypeToken<List<Document>>() {}.type))
+        }
     }
 
     // 현재 보관해놓은 데이터들을 JSON 데이터로 변환해 sharedPreferences에 저장하는 함수
@@ -217,14 +222,14 @@ class MainViewModel(
         gsonBuilder.registerTypeAdapter(Document::class.java, DocumentTypeAdapter())
         val editor = favoriteSharedPreferences.edit()
         val favoriteData = gsonBuilder.create().toJson(storageUiState.value?.selectedResult)
-        editor.putString("favorite_data", favoriteData)
+        editor.putString(KEY_SELECT_DATASET, favoriteData)
         editor.apply()
     }
 
     // 마지막 검색어를 sharedPreferences에 저장하는 함수
     fun saveWordSharedPreferences() {
         val edit = prefSharedPreferences.edit()
-        edit.putString("searchWord", lastWord.value)
+        edit.putString(KEY_SEARCH_WORD, lastWord.value)
         edit.apply()
     }
 
@@ -251,5 +256,15 @@ class MainViewModel(
             "sort" to "accuracy",
             "page" to page,
         )
+    }
+
+    fun processFirstSearch(word: String) {
+        page = 1
+        updateLastWord(word)
+        communicationNetwork(word, page++)
+    }
+
+    fun processScrollSearch() {
+        communicationNetwork(lastWord.value.toString(), page++)
     }
 }

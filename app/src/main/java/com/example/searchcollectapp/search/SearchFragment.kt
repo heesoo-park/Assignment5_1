@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -42,8 +43,6 @@ class SearchFragment : Fragment() {
         AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
     }
 
-    var page = 1
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -64,11 +63,17 @@ class SearchFragment : Fragment() {
     private fun initView() = with(binding) {
         // 검색 버튼 클릭 이벤트
         btnSearch.setOnClickListener {
-            page = 1
-            viewModel.updateLastWord(etSearch.text.toString())
-            viewModel.communicationNetwork(etSearch.text.toString(), page++)
-            rvSearchList.smoothScrollToPosition(0)
+            viewModel.processFirstSearch(etSearch.text.toString())
             goToFirstState()
+        }
+
+        etSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                viewModel.processFirstSearch(etSearch.text.toString())
+                goToFirstState()
+            }
+
+            false
         }
 
         // 리사이클러뷰 아이템 클릭 이벤트
@@ -105,8 +110,9 @@ class SearchFragment : Fragment() {
                     curVisible = true
                 }
 
+
                 if (recyclerView.canScrollVertically(1).not()) {
-                    viewModel.communicationNetwork(etSearch.text.toString(), page++)
+                    viewModel.processScrollSearch()
                 }
             }
         })
@@ -117,22 +123,6 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun loadWordSharedPreferences() {
-        viewModel.loadWordSharedPreferences()
-    }
-
-    // 키보드를 내리면서 EditText의 포커스를 해제하는 함수
-    private fun goToFirstState() {
-        binding.etSearch.clearFocus()
-
-        val inputMethodManager =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(
-            requireActivity().window.decorView.applicationWindowToken,
-            0
-        )
-    }
-
     // 뷰모델 초기화하는 함수
     private fun initViewModel() = with(viewModel) {
         searchUiState.observe(viewLifecycleOwner) {
@@ -141,6 +131,23 @@ class SearchFragment : Fragment() {
         lastWord.observe(viewLifecycleOwner) {
             binding.etSearch.setText(it)
         }
+    }
+
+    private fun loadWordSharedPreferences() {
+        viewModel.loadWordSharedPreferences()
+    }
+
+    // 화면을 최상단으로 이동하고 키보드를 내리면서 EditText의 포커스를 해제하는 함수
+    private fun goToFirstState() {
+        binding.rvSearchList.smoothScrollToPosition(0)
+        binding.etSearch.clearFocus()
+
+        val inputMethodManager =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(
+            requireActivity().window.decorView.applicationWindowToken,
+            0
+        )
     }
 
     override fun onDestroyView() {

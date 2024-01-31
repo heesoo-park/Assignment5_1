@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.searchcollectapp.Document
+import com.example.searchcollectapp.UseConstant.inputFormat
+import com.example.searchcollectapp.UseConstant.outputFormat
 import com.example.searchcollectapp.databinding.StorageResultImageBinding
 import com.example.searchcollectapp.databinding.StorageResultVideoBinding
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 class StorageAdapter(private val context: Context) :
     ListAdapter<Document, RecyclerView.ViewHolder>(ListComparator()){
@@ -23,10 +23,6 @@ class StorageAdapter(private val context: Context) :
     }
 
     var storageThumbnailClickListener: StorageThumbnailClickListener? = null
-
-    // 날짜와 시간 처리를 위한 포맷 변수들
-    private val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
-    private val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     // 이미지 데이터 처리하는 뷰 홀더
     inner class ImageStorageViewHolder(private val binding: StorageResultImageBinding) :
