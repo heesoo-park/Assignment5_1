@@ -20,6 +20,7 @@ class StorageAdapter(private val context: Context) :
     // 아이템에서 썸네일 클릭 이벤트 처리할 인터페이스 선언
     interface StorageThumbnailClickListener {
         fun onClick(selectedImageDocument: Document)
+        fun onLongClick(selectedDocument: Document)
     }
 
     var storageThumbnailClickListener: StorageThumbnailClickListener? = null
@@ -38,6 +39,10 @@ class StorageAdapter(private val context: Context) :
                 ivStorageResultImageThumbnail.setOnClickListener {
                     storageThumbnailClickListener?.onClick(document)
                 }
+                ivStorageResultImageThumbnail.setOnLongClickListener {
+                    storageThumbnailClickListener?.onLongClick(document)
+                    true
+                }
             }
         }
     }
@@ -55,6 +60,10 @@ class StorageAdapter(private val context: Context) :
                     outputFormat.format(inputFormat.parse(document.dateTime) as Date)
                 ivStorageResultVideoThumbnail.setOnClickListener {
                     storageThumbnailClickListener?.onClick(document)
+                }
+                ivStorageResultVideoThumbnail.setOnLongClickListener {
+                    storageThumbnailClickListener?.onLongClick(document)
+                    true
                 }
             }
         }

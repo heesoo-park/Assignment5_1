@@ -36,7 +36,11 @@ class MainViewModel(
 
     // 마지막 검색어를 저장하는 라이브 데이터
     private val _lastWord: MutableLiveData<String> = MutableLiveData()
-    val lastWord: LiveData<String> = _lastWord
+    val lastWord: LiveData<String> get() = _lastWord
+
+    // 필터 타입을 저장하는 라이브 데이터
+    private val _type: MutableLiveData<Int> = MutableLiveData(0)
+    val type: LiveData<Int> get() = _type
 
     // 마지막 검색어를 업데이트하는 함수
     private fun updateLastWord(word: String) {
@@ -233,14 +237,23 @@ class MainViewModel(
         edit.apply()
     }
 
-    // 서버로부터 데이터 통신하는 함수
-    fun communicationNetwork(word: String, page: Int) = viewModelScope.launch {
+    // 필터타입에 맞춰서 서버로부터 데이터 통신하는 함수
+    fun communicationNetwork(word: String, page: Int, type: Int) = viewModelScope.launch {
         val param = setUpSearchParameter(word, page.toString())
         val response = arrayListOf<Document>()
-        response.addAll(
-            NetworkClient.searchNetwork.searchImage(param).imageDocuments.orEmpty() +
-                    NetworkClient.searchNetwork.searchVideo(param).videoDocuments.orEmpty()
-        )
+
+        when (type) {
+            0 -> response.addAll(
+                NetworkClient.searchNetwork.searchImage(param).imageDocuments.orEmpty() +
+                        NetworkClient.searchNetwork.searchVideo(param).videoDocuments.orEmpty()
+            )
+            1 -> response.addAll(
+                NetworkClient.searchNetwork.searchImage(param).imageDocuments.orEmpty()
+            )
+            2 -> response.addAll(
+                NetworkClient.searchNetwork.searchVideo(param).videoDocuments.orEmpty()
+            )
+        }
 
         if (page > 1) {
             connectSearchResult(response)
@@ -258,13 +271,30 @@ class MainViewModel(
         )
     }
 
+    // 첫번째 검색 시 실행하는 함수
     fun processFirstSearch(word: String) {
+        if (word == "") return
+
         page = 1
         updateLastWord(word)
-        communicationNetwork(word, page++)
+        type.value?.let { communicationNetwork(word, page++, it) }
     }
 
+    // 스크롤을 최하단으로 내렸을 시 실행하는 함수
     fun processScrollSearch() {
-        communicationNetwork(lastWord.value.toString(), page++)
+        type.value?.let { communicationNetwork(lastWord.value.toString(), page++, it) }
+    }
+
+    // 필터 타입을 정하는 함수
+    fun setType(type: Int) {
+        _type.value = type
+    }
+
+    // 필터 타입 값이 변했을 때 호출되는 함수
+    fun filter(word: String, type: Int) {
+        if (word == "" || searchUiState.value?.searchResult.isNullOrEmpty()) return
+
+        page = 1
+        communicationNetwork(lastWord.value.toString(), page++, type)
     }
 }

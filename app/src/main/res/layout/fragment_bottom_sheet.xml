@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:paddingHorizontal="25dp"
+    android:paddingVertical="16dp">
+
+    <!-- BottomSheet에서 나가는 버튼이미지 -->
+    <ImageView
+        android:id="@+id/img_bottomSheet_clear_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@color/white"
+        android:src="@drawable/ic_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 보기 방식 -->
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="타입"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_bottomSheet_clear_btn" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_group_filter_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_type_1"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모두" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_type_2"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이미지" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_type_3"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비디오" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_1_1"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:backgroundTint="@color/selector_filter_button"-->
+<!--        android:text="모두"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/btn_bottomSheet_1_2"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_1_2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="이미지"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/btn_bottomSheet_1_1"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/btn_bottomSheet_1_3"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/btn_bottomSheet_1_1"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/btn_bottomSheet_1_1" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_1_3"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="비디오"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/btn_bottomSheet_1_2"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/btn_bottomSheet_1_2"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/btn_bottomSheet_1_2" />-->
+
+<!--    &lt;!&ndash; 정렬 방식 &ndash;&gt;-->
+<!--    <TextView-->
+<!--        android:id="@+id/textView2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="정렬 방식"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/textView"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/btn_bottomSheet_1_1" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_2_1"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:text="최신순"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/btn_bottomSheet_2_2"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView2" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_2_2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="가나다순"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/btn_bottomSheet_2_1"-->
+
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.5"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/btn_bottomSheet_2_1"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/btn_bottomSheet_2_1" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textView3"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:text="초기화"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/textView2"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/btn_bottomSheet_2_1" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btn_bottomSheet_3_1"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:text="처음 상태로 되돌리기"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView3" />-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="20dp"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/btn_bottomSheet_3_1"-->
+<!--        tools:layout_editor_absoluteX="16dp" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>

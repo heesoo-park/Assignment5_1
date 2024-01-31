@@ -21,6 +21,7 @@ class SearchAdapter(private val context: Context) :
     // 아이템에서 썸네일 클릭 이벤트 처리할 인테페이스 선언
     interface SearchThumbnailClickListener {
         fun onClick(selectedDocument: Document)
+        fun onLongClick(selectedDocument: Document)
     }
 
     var searchThumbnailClickListener: SearchThumbnailClickListener? = null
@@ -40,6 +41,10 @@ class SearchAdapter(private val context: Context) :
                 ivSearchResultImageThumbnail.setOnClickListener {
                     searchThumbnailClickListener?.onClick(document)
                 }
+                ivSearchResultImageThumbnail.setOnLongClickListener {
+                    searchThumbnailClickListener?.onLongClick(document)
+                    true
+                }
             }
         }
     }
@@ -58,6 +63,10 @@ class SearchAdapter(private val context: Context) :
                 ivSearchResultVideoFavorite.isVisible = document.isSelected
                 ivSearchResultVideoThumbnail.setOnClickListener {
                     searchThumbnailClickListener?.onClick(document)
+                }
+                ivSearchResultVideoThumbnail.setOnLongClickListener {
+                    searchThumbnailClickListener?.onLongClick(document)
+                    true
                 }
             }
         }

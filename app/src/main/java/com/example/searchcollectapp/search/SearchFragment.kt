@@ -1,5 +1,7 @@
 package com.example.searchcollectapp.search
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,6 +12,8 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -83,6 +87,22 @@ class SearchFragment : Fragment() {
                     viewModel.controlMarker(selectedDocument)
                     viewModel.manageSelectedDocument(selectedDocument)
                 }
+
+                override fun onLongClick(selectedDocument: Document) {
+                    val clipboardManager = requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clipData = ClipData.newPlainText(
+                        "url",
+                        when (selectedDocument) {
+                            is Document.ImageDocument -> {
+                                selectedDocument.docUrl
+                            }
+                            is Document.VideoDocument -> {
+                                selectedDocument.url
+                            }
+                        })
+                    clipboardManager.setPrimaryClip(clipData)
+                    Toast.makeText(requireContext(), "해당 데이터의 URL이 클립보드에 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
 
         rvSearchList.adapter = searchAdapter
@@ -121,6 +141,11 @@ class SearchFragment : Fragment() {
         fabSearchScrollUp.setOnClickListener {
             rvSearchList.smoothScrollToPosition(0)
         }
+
+        btnSearchFilter.setOnClickListener {
+            val bottomSheet = SearchBottomSheet()
+            bottomSheet.show(requireActivity().supportFragmentManager, bottomSheet.tag)
+        }
     }
 
     // 뷰모델 초기화하는 함수
@@ -130,6 +155,9 @@ class SearchFragment : Fragment() {
         }
         lastWord.observe(viewLifecycleOwner) {
             binding.etSearch.setText(it)
+        }
+        type.observe(viewLifecycleOwner) {
+            viewModel.filter(binding.etSearch.text.toString(), it)
         }
     }
 
