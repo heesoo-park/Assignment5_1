@@ -18,7 +18,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.R
 import com.example.searchcollectapp.databinding.FragmentSearchBinding
@@ -72,6 +71,7 @@ class SearchFragment : Fragment() {
             goToFirstState()
         }
 
+        // 키보드 검색 버튼 클릭 이벤트
         etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 viewModel.processFirstSearch(etSearch.text.toString())
@@ -81,7 +81,7 @@ class SearchFragment : Fragment() {
             false
         }
 
-        // 리사이클러뷰 아이템 클릭 이벤트
+        // 리사이클러뷰 아이템 클릭 이벤트, 롱클릭 이벤트
         searchAdapter.searchThumbnailClickListener =
             object : SearchAdapter.SearchThumbnailClickListener {
                 override fun onClick(selectedDocument: Document) {
@@ -163,6 +163,7 @@ class SearchFragment : Fragment() {
         }
     }
 
+    // SharedPreferences에 저장되어있는 마지막 검색 단어 불러오는 함수
     private fun loadWordSharedPreferences() {
         viewModel.loadWordSharedPreferences()
     }

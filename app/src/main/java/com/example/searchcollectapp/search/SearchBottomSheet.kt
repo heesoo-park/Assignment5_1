@@ -33,6 +33,7 @@ class SearchBottomSheet: BottomSheetDialogFragment() {
             dismiss()
         }
 
+        // 저장된 타입 라이브데이터 값에 맞춰 첫 세팅값 설정
         binding.toggleGroupFilterType.check(
             when (viewModel.type.value) {
                 0 -> R.id.btn_type_1
@@ -41,6 +42,7 @@ class SearchBottomSheet: BottomSheetDialogFragment() {
             }
         )
 
+        // 버튼이 눌렸을 때 타입 라이브데이터 값이 변경되도록 설정
         binding.toggleGroupFilterType.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {

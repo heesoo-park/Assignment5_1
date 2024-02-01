@@ -20,6 +20,7 @@ class MainViewModel(
     private val favoriteSharedPreferences: SharedPreferences
 ) : ViewModel() {
 
+    // 데이터 가져올 페이지 저장하는 변수
     private var page = 0
 
     // 검색 결과 페이지에 나오는 데이터를 저장하는 라이브 데이터
@@ -257,6 +258,7 @@ class MainViewModel(
             )
         }
 
+        // 첫 페이지면 검색결과 라이브데이터에 붙여넣고 아니라면 뒤에 붙이기
         if (page > 1) {
             connectSearchResult(response)
         } else {

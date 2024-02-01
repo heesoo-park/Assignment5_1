@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.Document
 import com.example.searchcollectapp.databinding.FragmentStorageBinding
@@ -47,7 +46,7 @@ class StorageFragment : Fragment() {
 
     // 뷰 초기화하는 함수
     private fun initView() = with(binding) {
-        // 리사이클러뷰 아이템 클릭 이벤트
+        // 리사이클러뷰 아이템 클릭 이벤트, 롱클릭 이벤트
         storageAdapter.storageThumbnailClickListener = object :
             StorageAdapter.StorageThumbnailClickListener {
             override fun onClick(selectedImageDocument: Document) {
