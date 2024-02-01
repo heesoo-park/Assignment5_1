@@ -14,12 +14,14 @@ import java.util.Locale
 class StorageAdapter(private val context: Context, private val favoriteItems: MutableList<Document>) :
     RecyclerView.Adapter<StorageAdapter.StorageViewHolder>() {
 
+    // 아이템 썸네일 클릭 했을 때 처리하기 위한 인터페이스
     interface StorageThumbnailClickListener {
         fun onClick(position: Int)
     }
 
     var storageThumbnailClickListener: StorageThumbnailClickListener? = null
 
+    // 날짜 형식을 포맷하기 위한 변수들
     private val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
     private val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 

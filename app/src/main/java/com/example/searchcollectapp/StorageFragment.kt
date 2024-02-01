@@ -1,6 +1,5 @@
 package com.example.searchcollectapp
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,10 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.searchcollectapp.databinding.FragmentStorageBinding
-
-interface SendDeleteInfo {
-    fun sendDocument(position: Int)
-}
 
 class StorageFragment : Fragment() {
 
@@ -27,11 +22,8 @@ class StorageFragment : Fragment() {
     private var _binding: FragmentStorageBinding? = null
     private val binding get() = _binding!!
 
+    // 선택한 데이터를 저장하는 리스트
     private var favoriteItems: ArrayList<Document> = arrayListOf()
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +44,7 @@ class StorageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = StorageAdapter(requireContext(), favoriteItems)
+        // 리사이클러뷰 아이템 썸네일 클릭 리스너
         adapter.storageThumbnailClickListener = object : StorageAdapter.StorageThumbnailClickListener {
             override fun onClick(position: Int) {
                 favoriteItems.removeAt(position)

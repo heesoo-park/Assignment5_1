@@ -12,15 +12,21 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SearchAdapter(private val context: Context, private val results: MutableList<Document>, private val favoriteItems: MutableList<Document>) :
+class SearchAdapter(
+    private val context: Context,
+    private val results: MutableList<Document>,
+    private val favoriteItems: MutableList<Document>
+) :
     RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
+    // 아이템 썸네일 클릭 했을 때 처리하기 위한 인터페이스
     interface SearchThumbnailClickListener {
         fun onClick(view: View, position: Int)
     }
 
     var searchThumbnailClickListener: SearchThumbnailClickListener? = null
 
+    // 날짜 형식을 포맷하기 위한 변수들
     private val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
     private val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 

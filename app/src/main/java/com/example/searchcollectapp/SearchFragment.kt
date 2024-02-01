@@ -10,13 +10,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.searchcollectapp.databinding.FragmentSearchBinding
 
-interface SendFavoriteInfo {
-    fun sendDocument(document: Document)
-}
-
 class SearchFragment : Fragment() {
 
     companion object {
+        // 프래그먼트를 만들 때 두개의 ArrayList를 받아옴
         fun newInstance(result: ArrayList<Document>, favoriteItems: ArrayList<Document>) =
             SearchFragment().apply {
                 arguments = Bundle().apply {
@@ -26,18 +23,13 @@ class SearchFragment : Fragment() {
             }
     }
 
-    private var sendFavoriteInfo: SendFavoriteInfo? = null
-
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
+    // 검색 결과를 저장하는 리스트
     private var result: ArrayList<Document> = arrayListOf()
+    // 선택한 데이터를 저장하는 리스트
     private var favoriteItems: ArrayList<Document> = arrayListOf()
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        sendFavoriteInfo = context as SendFavoriteInfo
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +51,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = SearchAdapter(requireContext(), result, favoriteItems)
+        // 리사이클러뷰 아이템 썸네일 클릭 리스너
         adapter.searchThumbnailClickListener = object : SearchAdapter.SearchThumbnailClickListener {
             override fun onClick(view: View, position: Int) {
                 if (favoriteItems.find { it == result[position] } != null) {
