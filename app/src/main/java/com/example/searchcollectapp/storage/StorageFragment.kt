@@ -1,14 +1,11 @@
 package com.example.searchcollectapp.storage
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.Document
@@ -55,26 +52,17 @@ class StorageFragment : Fragment() {
             }
 
             override fun onLongClick(selectedDocument: Document) {
-                val clipboardManager = requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
-                val clipData = ClipData.newPlainText(
-                    "url",
-                    when (selectedDocument) {
-                        is Document.ImageDocument -> {
-                            selectedDocument.docUrl
-                        }
-                        is Document.VideoDocument -> {
-                            selectedDocument.url
-                        }
-                    })
-                clipboardManager.setPrimaryClip(clipData)
-                Toast.makeText(requireContext(), "해당 데이터의 URL이 클립보드에 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                viewModel.storeClipboard(selectedDocument)
+                Toast.makeText(requireContext(), "해당 데이터의 URL이 클립보드에 저장되었습니다.", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
         rvStorageList.adapter = storageAdapter
-        rvStorageList.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
-            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-        }
+        rvStorageList.layoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL).apply {
+                gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+            }
         rvStorageList.itemAnimator = null
     }
 

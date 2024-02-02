@@ -1,5 +1,7 @@
 package com.example.searchcollectapp.main
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +18,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 
 class MainViewModel(
+    private val clipboardManager: ClipboardManager,
     private val prefSharedPreferences: SharedPreferences,
     private val favoriteSharedPreferences: SharedPreferences
 ) : ViewModel() {
@@ -42,6 +45,14 @@ class MainViewModel(
     // 필터 타입을 저장하는 라이브 데이터
     private val _type: MutableLiveData<Int> = MutableLiveData(0)
     val type: LiveData<Int> get() = _type
+
+    private val _settingEvent: MutableLiveData<Boolean> = MutableLiveData()
+    val settingEvent: LiveData<Boolean> get() = _settingEvent
+
+    // 화면을 최상단으로 이동하고 키보드를 내리면서 EditText의 포커스를 해제하는 함수
+    fun goToFirstState() {
+        _settingEvent.value = settingEvent.value?.not()
+    }
 
     // 마지막 검색어를 업데이트하는 함수
     private fun updateLastWord(word: String) {
@@ -196,6 +207,8 @@ class MainViewModel(
                     }
             )
         }
+        // 아이템을 선택하거나 뺄 때마다 SharedPreference에 저장
+        saveDataSharedPreferences()
     }
 
     // JSON 데이터를 List타입으로 변환시켜 내 보관함 페이지에 보여질 데이터를 저장하는 라이브 데이터에 저장하는 함수
@@ -300,5 +313,19 @@ class MainViewModel(
 
         page = 1
         communicationNetwork(lastWord.value.toString(), page++)
+    }
+    // 클립보드에 url 저장하는 함수
+    fun storeClipboard(selectedDocument: Document) {
+        val clipData = ClipData.newPlainText(
+            "url",
+            when (selectedDocument) {
+                is Document.ImageDocument -> {
+                    selectedDocument.docUrl
+                }
+                is Document.VideoDocument -> {
+                    selectedDocument.url
+                }
+            })
+        clipboardManager.setPrimaryClip(clipData)
     }
 }
