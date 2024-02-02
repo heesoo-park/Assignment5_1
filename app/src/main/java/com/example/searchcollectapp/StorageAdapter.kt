@@ -30,6 +30,12 @@ class StorageAdapter(private val context: Context, private val favoriteItems: Mu
         val thumbnail = binding.ivSearchResultThumbnail
         val site = binding.tvSearchResultSite
         val datetime = binding.tvSearchResultDatetime
+
+        init {
+            thumbnail.setOnClickListener {
+                storageThumbnailClickListener?.onClick(adapterPosition)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StorageViewHolder {
@@ -47,10 +53,6 @@ class StorageAdapter(private val context: Context, private val favoriteItems: Mu
     }
 
     override fun onBindViewHolder(holder: StorageViewHolder, position: Int) {
-        holder.thumbnail.setOnClickListener {
-            storageThumbnailClickListener?.onClick(position)
-        }
-
         Glide.with(context)
             .load(favoriteItems[position].thumbnailUrl)
             .into(holder.thumbnail)

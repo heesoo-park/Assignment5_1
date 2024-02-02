@@ -33,13 +33,17 @@ class MainActivity : AppCompatActivity() {
 
         // 검색 버튼 클릭 이벤트
         binding.btnMainSearch.setOnClickListener {
-            communicationNetwork(setUpSearchParameter(binding.etMainSearch.text.toString()))
+            val word = binding.etMainSearch.text.toString()
+            if (word.isNotEmpty()) {
+                saveLastSearchWord(word)
+                communicationNetwork(setUpSearchParameter(word))
+                Toast.makeText(this, "검색 중입니다...", Toast.LENGTH_SHORT).show()
+            }
 
             binding.etMainSearch.clearFocus()
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             inputMethodManager.hideSoftInputFromWindow(window.decorView.applicationWindowToken, 0)
-            Toast.makeText(this, "검색 중입니다...", Toast.LENGTH_SHORT).show()
         }
 
         // 검색결과 버튼 클릭 이벤트
@@ -80,20 +84,13 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.commit {
             replace(R.id.frame_layout_main, fragment)
             setReorderingAllowed(true)
-            addToBackStack("")
         }
     }
 
-    // 뒤로가기 버튼 눌렀을 때 조건에 맞춰 처리하는 함수
-    override fun onBackPressed() {
-        if (supportFragmentManager.fragments[0] is SearchFragment) {
-            val pref = getSharedPreferences("pref", MODE_PRIVATE)
-            val edit = pref.edit()
-            edit.putString("searchWord", binding.etMainSearch.text.toString())
-            edit.apply()
-            finish()
-        }
-
-        super.onBackPressed()
+    private fun saveLastSearchWord(word: String) {
+        val pref = getSharedPreferences("pref", MODE_PRIVATE)
+        val edit = pref.edit()
+        edit.putString("searchWord", word)
+        edit.apply()
     }
 }

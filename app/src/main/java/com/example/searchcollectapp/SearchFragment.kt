@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.searchcollectapp.databinding.FragmentSearchBinding
 
 class SearchFragment : Fragment() {
@@ -65,7 +66,8 @@ class SearchFragment : Fragment() {
             }
         }
         binding.rvSearchList.adapter = adapter
-        binding.rvSearchList.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvSearchList.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.rvSearchList.itemAnimator = null
     }
 
     override fun onDestroyView() {

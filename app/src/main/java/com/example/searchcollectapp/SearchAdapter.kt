@@ -30,7 +30,7 @@ class SearchAdapter(
     private val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
     private val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
-    inner class SearchViewHolder(private val binding: SearchResultItemBinding) :
+    class SearchViewHolder(private val binding: SearchResultItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val thumbnail = binding.ivSearchResultThumbnail
         val site = binding.tvSearchResultSite
